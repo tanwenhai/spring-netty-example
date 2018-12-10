@@ -5,8 +5,12 @@ netty:
   server:
     ssl: false
     port: 9999
-    boss-group: io.netty.channel.nio.NioEventLoopGroup
     channel: io.netty.channel.socket.nio.NioServerSocketChannel
+    boss-group:
+      eventLoopGroup: io.netty.channel.nio.NioEventLoopGroup
+    block-group:
+      eventLoopGroup: io.netty.channel.nio.NioEventLoopGroup
+      threads: 50
     socket:
       keepalive: true
       backlog: 100

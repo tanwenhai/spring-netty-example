@@ -41,17 +41,26 @@ public class NettyServerConfiguration {
     public EventLoopGroup bossGroup() {
         try {
             return nettyServerProperties.getBossGroup().newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new ApplicationContextException("bossGroup参数配置错误");
+        } catch (Exception e) {
+            throw new ApplicationContextException("bossGroup参数配置错误", e);
         }
     }
 
     @Bean(destroyMethod = "shutdownGracefully")
     public EventLoopGroup workGroup() {
         try {
-            return nettyServerProperties.getBossGroup().newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new ApplicationContextException("workGroup参数配置错误");
+            return nettyServerProperties.getWorkGroup().newInstance();
+        } catch (Exception e) {
+            throw new ApplicationContextException("workGroup参数配置错误", e);
+        }
+    }
+
+    @Bean(destroyMethod = "shutdownGracefully")
+    public EventLoopGroup blockGroup() {
+        try {
+            return nettyServerProperties.getBlockGroup().newInstance();
+        } catch (Exception e) {
+            throw new ApplicationContextException("workGroup参数配置错误", e);
         }
     }
 }

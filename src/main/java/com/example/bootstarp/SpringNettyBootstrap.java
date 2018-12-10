@@ -67,7 +67,7 @@ public class SpringNettyBootstrap implements ApplicationRunner {
             log.info("started and listening for connections on" + f.channel().localAddress());
             f.channel().closeFuture().sync();
         } catch (Exception e) {
-            throw new ApplicationContextException(e.getMessage());
+            throw new ApplicationContextException(e.getMessage(), e);
         }
     }
 }
