@@ -5,6 +5,7 @@ import com.example.codec.MessageCodec;
 import com.example.proto.Frame;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
@@ -34,6 +35,9 @@ public class ConnectionInitializer extends ChannelInitializer<SocketChannel> {
     @Autowired
     DispatchMessage dispatchMessage;
 
+    @Autowired
+    EventLoopGroup blockGroup;
+
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
         ChannelPipeline p = ch.pipeline();
@@ -50,6 +54,6 @@ public class ConnectionInitializer extends ChannelInitializer<SocketChannel> {
                 .addLast(new ProtobufVarint32LengthFieldPrepender())
                 .addLast(new ProtobufEncoder())
                 .addLast(messageCodec)
-                .addLast(dispatchMessage);
+                .addLast(blockGroup, dispatchMessage);
     }
 }
