@@ -1,8 +1,6 @@
 package com.example.configuration;
 
-import io.netty.channel.EventLoopGroup;
 import io.netty.channel.ServerChannel;
-import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.Getter;
 import lombok.Setter;
@@ -48,7 +46,7 @@ public class NettyServerProperties {
     private EventLoopGroupProperties workGroup = new EventLoopGroupProperties("work");
 
     /**
-     * channel 类型 windows nio linux epool
+     * channel 类型 windows nio/linux epool
      */
     private Class<? extends ServerChannel> channel = NioServerSocketChannel.class;
 }
