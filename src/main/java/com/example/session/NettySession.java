@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import io.netty.util.Recycler;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
 
@@ -15,7 +16,7 @@ public class NettySession implements Session {
     /**
      * 存放所有session
      */
-    private static ConcurrentMap<UUID, NettySession> MAP = Maps.newConcurrentMap();
+    private static ConcurrentMap<UUID, NettySession> SESSION_MAP = Maps.newConcurrentMap();
 
     private Recycler.Handle<NettySession> handle;
 
@@ -28,6 +29,8 @@ public class NettySession implements Session {
             return new NettySession(handle);
         }
     };
+
+    private final Map attributes = Maps.newHashMap();
 
     /**
      * 创建时间
@@ -57,11 +60,12 @@ public class NettySession implements Session {
     public void init() {
         sessionId = UUID.randomUUID();
         isNew = true;
-        MAP.put(getId(), this);
+        SESSION_MAP.put(getId(), this);
         lastAccessedTime = Instant.now().getEpochSecond();
         creationTime = lastAccessedTime;
+        attributes.clear();
 
-        MAP.put(sessionId, this);
+        SESSION_MAP.put(sessionId, this);
     }
 
     public static NettySession valueOf(UUID sessionId) {
@@ -69,7 +73,7 @@ public class NettySession implements Session {
         if (sessionId == null) {
             session = newInstance();
         } else {
-            session = MAP.get(sessionId);
+            session = SESSION_MAP.get(sessionId);
         }
 
         if (session == null) {
@@ -116,32 +120,27 @@ public class NettySession implements Session {
 
     @Override
     public Object getAttribute(String name) {
-        return null;
+        return attributes.get(name);
     }
 
     @Override
     public void setAttribute(String name, Object value) {
-
+        attributes.put(name, value);
     }
 
     @Override
     public void removeAttribute(String name) {
-
+        attributes.remove(name);
     }
 
     @Override
     public void invalidate() {
-
+        SESSION_MAP.remove(this.getId());
+        handle.recycle(this);
     }
 
     @Override
     public boolean isNew() {
         return isNew;
-    }
-
-    @Override
-    public void destory() {
-        MAP.remove(this.getId());
-        handle.recycle(this);
     }
 }

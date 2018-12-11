@@ -60,7 +60,7 @@ public interface Session {
     void removeAttribute(String name);
 
     /**
-     * 是否有效
+     * 销毁
      */
     void invalidate();
 
@@ -69,9 +69,4 @@ public interface Session {
      * @return
      */
     boolean isNew();
-
-    /**
-     * 销毁
-     */
-    void destory();
 }
