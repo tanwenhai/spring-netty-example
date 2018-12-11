@@ -2,4 +2,5 @@
 1. 配置化
 2. gradle plugin 生成protobuf类
 3. msg 分发
-4. xxx
+4. session
+5. xxx

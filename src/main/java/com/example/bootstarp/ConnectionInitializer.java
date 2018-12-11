@@ -3,9 +3,7 @@ package com.example.bootstarp;
 import com.example.codec.DispatchMessage;
 import com.example.codec.MessageCodec;
 import com.example.proto.Frame;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
@@ -49,6 +47,7 @@ public class ConnectionInitializer extends ChannelInitializer<SocketChannel> {
         if (log.isDebugEnabled()) {
             p.addLast(new LoggingHandler(LogLevel.DEBUG));
         }
+
         p.addLast(new ProtobufVarint32FrameDecoder())
                 .addLast(new ProtobufDecoder(Frame.getDefaultInstance()))
                 .addLast(new ProtobufVarint32LengthFieldPrepender())

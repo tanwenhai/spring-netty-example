@@ -1,12 +1,15 @@
 package com.example.codec;
 
 import com.example.proto.Frame;
+import com.example.session.NettySession;
 import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.MessageLite;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageCodec;
+import io.netty.util.Attribute;
+import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
@@ -63,6 +66,7 @@ public class MessageCodec extends MessageToMessageCodec<Frame, MessageLite> {
     @Override
     protected void decode(ChannelHandlerContext ctx, Frame msg, List<Object> out) throws Exception {
         String type = msg.getMessageType();
+
         ByteString body = msg.getPayload();
 
         Method method = methodCache.get(type);

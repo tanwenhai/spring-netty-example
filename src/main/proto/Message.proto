@@ -11,3 +11,9 @@ message Frame {
 message TextMessage {
     string text = 1;
 }
+
+
+message LoginMessage {
+    string userName = 1;
+    string password = 2;
+}

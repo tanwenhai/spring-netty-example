@@ -10,9 +10,9 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.core.ResolvableType;
 import org.springframework.stereotype.Component;
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
@@ -53,15 +53,21 @@ public class DispatchMessage extends SimpleChannelInboundHandler<MessageLite> im
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, MessageLite msg) throws Exception {
-        String key = msg.getClass().getName();
-        if (!(msg instanceof Frame) && handlerCache.containsKey(key)) {
-            MessageConsume consume = handlerCache.get(key);
+        // 将ctx绑定到业务线程
+        try {
+            ChannelHandlerContextHolder.setCtx(ctx);
+            String key = msg.getClass().getName();
+            if (!(msg instanceof Frame) && handlerCache.containsKey(key)) {
+                MessageConsume consume = handlerCache.get(key);
 
-            MessageLite rtv = consume.consume(msg);
-            ctx.writeAndFlush(rtv);
-        } else {
-            // 不处理 交给下一个处理
-            ctx.write(msg);
+                MessageLite rtv = consume.consume(msg);
+                ctx.writeAndFlush(rtv);
+            } else {
+                // 不处理 交给下一个处理
+                ctx.write(msg);
+            }
+        } finally {
+            ChannelHandlerContextHolder.clear();
         }
     }
 }
