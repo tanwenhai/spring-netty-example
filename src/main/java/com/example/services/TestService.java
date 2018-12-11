@@ -14,13 +14,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class TestService implements MessageConsume<TextMessage> {
 
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     Session session;
 
     @Override
     public TextMessage consume(TextMessage msg) {
         log.debug("收到消息 {}", msg);
-        session.destory();
+        session.invalidate();
         return TextMessage.newBuilder().setText(msg.getText() + " xixi").build();
     }
 }
