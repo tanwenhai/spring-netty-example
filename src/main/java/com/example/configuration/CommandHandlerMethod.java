@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import org.springframework.core.MethodParameter;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -12,6 +13,8 @@ import java.lang.reflect.Method;
 @Builder
 @Getter
 public class CommandHandlerMethod {
+    private final String handler;
+
     private final String path;
 
     private final Method method;

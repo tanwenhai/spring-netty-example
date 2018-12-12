@@ -74,7 +74,7 @@ public class CommandHandlerMethodMapping implements ApplicationContextAware {
             Map<Method, CommandHandlerMethod> methods = MethodIntrospector.selectMethods(userType,
                     (MethodIntrospector.MetadataLookup<CommandHandlerMethod>) method -> {
                         try {
-                            return getMappingForMethod(method);
+                            return getMappingForMethod(method, handler);
                         }
                         catch (Throwable ex) {
                             throw new IllegalStateException("Invalid mapping on handler class [" +
@@ -101,13 +101,13 @@ public class CommandHandlerMethodMapping implements ApplicationContextAware {
         return AnnotatedElementUtils.hasAnnotation(beanType, CommandController.class);
     }
 
-    private CommandHandlerMethod getMappingForMethod(Method method) {
-        CommandHandlerMethod info = createRequestMappingInfo(method);
+    private CommandHandlerMethod getMappingForMethod(Method method, String handler) {
+        CommandHandlerMethod info = createRequestMappingInfo(method, handler);
 
         return info;
     }
 
-    private CommandHandlerMethod createRequestMappingInfo(Method method) {
+    private CommandHandlerMethod createRequestMappingInfo(Method method, String handler) {
         CommandMapper commandMapper = AnnotatedElementUtils.findMergedAnnotation(method, CommandMapper.class);
 
         Parameter[] parameters = method.getParameters();
@@ -118,6 +118,7 @@ public class CommandHandlerMethodMapping implements ApplicationContextAware {
 
         return CommandHandlerMethod.builder()
                 .path(commandMapper.value())
+                .handler(handler)
                 .method(method)
                 .parameters(methodParameters)
                 .build();

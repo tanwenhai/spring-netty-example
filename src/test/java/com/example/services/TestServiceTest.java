@@ -1,7 +1,6 @@
 package com.example.services;
 
 import com.example.codec.DispatchMessage;
-import com.example.codec.MessageCodec;
 import com.example.proto.Frame;
 import com.example.proto.TextMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -25,9 +24,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class TestServiceTest {
 
     @Autowired
-    MessageCodec messageCodec;
-
-    @Autowired
     DispatchMessage dispatchMessage;
 
     @Test
@@ -36,18 +32,17 @@ public class TestServiceTest {
                 new ProtobufVarint32FrameDecoder(),
                 new ProtobufDecoder(Frame.getDefaultInstance()),
                 new ProtobufVarint32LengthFieldPrepender(),
-                messageCodec,
                 dispatchMessage
         );
         long end = System.currentTimeMillis() + 60 * 1000;
 
         long count = 0;
         while (System.currentTimeMillis() < end) {
-            TextMessage build = TextMessage.newBuilder().setText("1111").build();
-            channel.writeInbound(build);
-            Frame o = channel.readOutbound();
-            TextMessage rtv = TextMessage.parseFrom(o.getPayload());
-            Assert.assertEquals(build.getText() + " xixi", rtv.getText());
+            TextMessage textMessage = TextMessage.newBuilder().setText("1111").build();
+            Frame frame = Frame.newBuilder().setPath("/hello/say").setPayload(textMessage.toByteString()).build();
+            channel.writeInbound(frame);
+            TextMessage rtv = channel.readOutbound();
+            Assert.assertEquals(textMessage.getText() + " xixi", rtv.getText());
             count ++;
         }
         System.out.println(count / 60);

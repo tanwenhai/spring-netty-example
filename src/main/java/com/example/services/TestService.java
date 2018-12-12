@@ -1,6 +1,5 @@
 package com.example.services;
 
-import com.example.annotation.MessageConsume;
 import com.example.proto.TextMessage;
 import com.example.session.Session;
 import lombok.extern.slf4j.Slf4j;
@@ -12,13 +11,12 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-public class TestService implements MessageConsume<TextMessage> {
+public class TestService {
 
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     Session session;
 
-    @Override
     public TextMessage consume(TextMessage msg) {
         log.debug("收到消息 {}", msg);
         session.invalidate();

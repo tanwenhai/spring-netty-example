@@ -1,7 +1,6 @@
 package com.example.bootstarp;
 
 import com.example.codec.DispatchMessage;
-import com.example.codec.MessageCodec;
 import com.example.proto.Frame;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
@@ -28,9 +27,6 @@ public class ConnectionInitializer extends ChannelInitializer<SocketChannel> {
     SslContext sslCtx;
 
     @Autowired
-    MessageCodec messageCodec;
-
-    @Autowired
     DispatchMessage dispatchMessage;
 
     @Autowired
@@ -52,7 +48,6 @@ public class ConnectionInitializer extends ChannelInitializer<SocketChannel> {
                 .addLast(new ProtobufDecoder(Frame.getDefaultInstance()))
                 .addLast(new ProtobufVarint32LengthFieldPrepender())
                 .addLast(new ProtobufEncoder())
-                .addLast(messageCodec)
                 .addLast(blockGroup, dispatchMessage);
     }
 }

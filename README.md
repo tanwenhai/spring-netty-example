@@ -1,6 +1,6 @@
 ### Spring Boot(Sprint 5) + Netty 4
-1. 配置化
-2. gradle plugin 生成protobuf类
-3. mvc(未完成)
-4. session
-5. xxx
+- [x] 配置化
+- [x] gradle plugin 生成protobuf类
+- [x] mvc(简单版本)
+- [x] session
+- [ ] 异常处理
