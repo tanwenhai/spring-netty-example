@@ -1,0 +1,43 @@
+buildscript {
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath "io.franzbecker:gradle-lombok:1.14"
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: "io.franzbecker.gradle-lombok"
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+bootJar {
+    launchScript()
+}
+
+dependencies {
+    implementation('org.springframework.boot:spring-boot-starter-actuator')
+    // https://mvnrepository.com/artifact/io.netty/netty-all
+    implementation group: 'io.netty', name: 'netty-all', version: '4.1.32.Final'
+
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.8.1'
+
+    // https://mvnrepository.com/artifact/com.google.protobuf/protoc
+    compile group: 'com.google.protobuf', name: 'protoc', version: '3.6.1', ext: 'pom'
+
+    compileOnly 'org.projectlombok:lombok:1.18.4'
+
+    compile project(":proto-message")
+
+    compileOnly('org.springframework.boot:spring-boot-configuration-processor')
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+}

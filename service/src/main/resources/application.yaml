@@ -1,0 +1,16 @@
+#context:
+#  initializer:
+#    classes: com.example.bootstarp.SpringNettyBootstarp
+netty:
+  server:
+    ssl: false
+    port: 9999
+    channel: io.netty.channel.socket.nio.NioServerSocketChannel
+    boss-group:
+      eventLoopGroup: io.netty.channel.nio.NioEventLoopGroup
+    block-group:
+      eventLoopGroup: io.netty.channel.nio.NioEventLoopGroup
+      threads: 200
+    socket:
+      keepalive: true
+      backlog: 100
