@@ -9,10 +9,6 @@ repositories {
     mavenCentral()
 }
 
-bootJar {
-    launchScript()
-}
-
 dependencies {
     // https://mvnrepository.com/artifact/io.netty/netty-all
     implementation group: 'io.netty', name: 'netty-all', version: '4.1.32.Final'
