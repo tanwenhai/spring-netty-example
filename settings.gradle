@@ -1,4 +1,5 @@
 rootProject.name = 'spring-netty'
 include 'proto-message'
 include 'service'
+include 'benchmark'
 

@@ -8,6 +8,8 @@ import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,7 +36,7 @@ public class TestServiceTest {
                 new ProtobufVarint32LengthFieldPrepender(),
                 dispatchMessage
         );
-        long end = System.currentTimeMillis() + 60 * 1000;
+        long end = System.currentTimeMillis() + 600 * 1000;
 
         long count = 0;
         while (System.currentTimeMillis() < end) {
