@@ -52,9 +52,6 @@ repositories {
 
 protobuf {
     generatedFilesBaseDir = "$projectDir/src/generated"
-//    protoc {
-//        path = '/usr/local/bin/protoc'
-//    }
 }
 
 clean {
@@ -85,6 +82,9 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.8.1'
+
+    // https://mvnrepository.com/artifact/com.google.protobuf/protoc
+    compile group: 'com.google.protobuf', name: 'protoc', version: '3.6.1', ext: 'pom'
 
     compileOnly 'org.projectlombok:lombok:1.18.4'
 

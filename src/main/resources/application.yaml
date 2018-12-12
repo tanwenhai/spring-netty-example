@@ -10,7 +10,7 @@ netty:
       eventLoopGroup: io.netty.channel.nio.NioEventLoopGroup
     block-group:
       eventLoopGroup: io.netty.channel.nio.NioEventLoopGroup
-      threads: 50
+      threads: 200
     socket:
       keepalive: true
       backlog: 100
