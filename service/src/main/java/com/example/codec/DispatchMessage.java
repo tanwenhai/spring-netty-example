@@ -22,6 +22,8 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 
 /**
  * 分发消息
@@ -32,6 +34,14 @@ import java.util.Set;
 @ChannelHandler.Sharable
 public class DispatchMessage extends SimpleChannelInboundHandler<Frame> implements ApplicationContextAware {
     private ApplicationContext applicationContext;
+
+    private volatile long count = 0;
+
+    private final AtomicLongFieldUpdater countUpdater = AtomicLongFieldUpdater.newUpdater(DispatchMessage.class, "count");
+
+    private long startTime = System.currentTimeMillis();
+
+    private volatile boolean started = false;
 
     /**
      * protobuf 类 parseFrom方法缓存
@@ -84,9 +94,31 @@ public class DispatchMessage extends SimpleChannelInboundHandler<Frame> implemen
                 }
                 Object rtv = handlerMethod.getMethod().invoke(applicationContext.getBean(handlerMethod.getHandler()), arg);
                 ctx.writeAndFlush(rtv);
+                if (started) {
+                    // 统计请求数
+                    countUpdater.incrementAndGet(this);
+                }
             }
         } finally {
             ChannelHandlerContextHolder.clear();
         }
+    }
+
+    public void startCount() {
+        count = 0;
+        startTime = System.currentTimeMillis();
+        started = true;
+    }
+
+    public void stopCount() {
+        started = false;
+    }
+
+    public long getCount() {
+        return count;
+    }
+
+    public long getStartTime() {
+        return startTime;
     }
 }

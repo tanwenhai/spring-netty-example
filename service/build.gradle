@@ -25,6 +25,10 @@ bootJar {
 
 dependencies {
     implementation('org.springframework.boot:spring-boot-starter-actuator')
+
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
+    implementation('org.springframework.boot:spring-boot-starter-web')
+
     // https://mvnrepository.com/artifact/io.netty/netty-all
     implementation group: 'io.netty', name: 'netty-all', version: '4.1.32.Final'
 
