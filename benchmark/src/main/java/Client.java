@@ -57,7 +57,7 @@ public class Client {
         } finally {
             group.shutdownGracefully().sync();
         }
-
+        counterHandler.getqps();
     }
 }
 
@@ -75,7 +75,6 @@ class CounterHandler extends SimpleChannelInboundHandler<TextMessage> {
             Frame frame = Frame.newBuilder().setPath("/hello/say").setPayload(textMessage.toByteString()).build();
             ctx.writeAndFlush(frame);
         } else {
-            System.out.println(count / 60);
             ctx.close();
         }
     }
@@ -97,7 +96,7 @@ class CounterHandler extends SimpleChannelInboundHandler<TextMessage> {
         super.exceptionCaught(ctx, cause);
     }
 
-    private long getCount() {
-        return count;
+    public long getqps() {
+        return count / 60;
     }
 }
