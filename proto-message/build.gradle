@@ -7,6 +7,7 @@ buildscript {
 apply plugin: "java"
 apply plugin: "idea"
 apply plugin: "com.google.protobuf"
+apply plugin: "maven"
 
 group 'com.example'
 version '0.0.1-SNAPSHOT'
@@ -14,6 +15,10 @@ sourceCompatibility = 1.8
 
 protobuf {
     generatedFilesBaseDir = "$projectDir/src/generated"
+    protoc {
+        // The artifact spec for the Protobuf Compiler
+        artifact = 'com.google.protobuf:protoc:3.6.1'
+    }
 }
 
 clean {
@@ -33,6 +38,4 @@ idea {
 dependencies {
     // https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java-util
     compile group: 'com.google.protobuf', name: 'protobuf-java-util', version: '3.6.1'
-    // https://mvnrepository.com/artifact/com.google.protobuf/protoc
-    compile group: 'com.google.protobuf', name: 'protoc', version: '3.6.1', ext: 'pom'
 }

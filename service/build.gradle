@@ -27,7 +27,10 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter-actuator')
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
-    implementation('org.springframework.boot:spring-boot-starter-web')
+    implementation ('org.springframework.boot:spring-boot-starter-web') {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+    }
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-undertow'
 
     // https://mvnrepository.com/artifact/io.netty/netty-all
     implementation group: 'io.netty', name: 'netty-all', version: '4.1.32.Final'
@@ -35,12 +38,9 @@ dependencies {
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.8.1'
 
-    // https://mvnrepository.com/artifact/com.google.protobuf/protoc
-    compile group: 'com.google.protobuf', name: 'protoc', version: '3.6.1', ext: 'pom'
-
     compileOnly 'org.projectlombok:lombok:1.18.4'
 
-    compile project(":proto-message")
+    implementation project(":proto-message")
 
     compileOnly('org.springframework.boot:spring-boot-configuration-processor')
     testImplementation('org.springframework.boot:spring-boot-starter-test')
