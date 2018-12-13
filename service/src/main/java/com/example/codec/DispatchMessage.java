@@ -22,7 +22,8 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 
 /**
@@ -35,18 +36,21 @@ import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 public class DispatchMessage extends SimpleChannelInboundHandler<Frame> implements ApplicationContextAware {
     private ApplicationContext applicationContext;
 
-    private volatile long count = 0;
+    private volatile long beginTime = 0;
+    private volatile long totalResponseTime = 0;
+    private volatile int totalRequest = 0;
 
-    private final AtomicLongFieldUpdater countUpdater = AtomicLongFieldUpdater.newUpdater(DispatchMessage.class, "count");
-
-    private long startTime = System.currentTimeMillis();
-
-    private volatile boolean started = false;
+    private AtomicLongFieldUpdater beginTimeUpdater = AtomicLongFieldUpdater.newUpdater(DispatchMessage.class, "beginTime");
+    private AtomicLongFieldUpdater totalResponseTimeUpdater = AtomicLongFieldUpdater.newUpdater(DispatchMessage.class, "totalResponseTime");
+    private AtomicIntegerFieldUpdater totalRequestUpdater = AtomicIntegerFieldUpdater.newUpdater(DispatchMessage.class, "totalRequest");
 
     /**
      * protobuf 类 parseFrom方法缓存
      */
     private final static ImmutableMap<String, Method> methodCache;
+
+    @Autowired
+    CommandHandlerMethodMapping commandHandlerMethodMapping;
 
     static {
         ImmutableMap.Builder<String, Method> builder = ImmutableMap.builder();
@@ -69,8 +73,24 @@ public class DispatchMessage extends SimpleChannelInboundHandler<Frame> implemen
         methodCache = builder.build();
     }
 
-    @Autowired
-    CommandHandlerMethodMapping commandHandlerMethodMapping;
+
+    @Override
+    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+        if (beginTimeUpdater.compareAndSet(this,0L, System.currentTimeMillis())) {
+            ctx.executor().scheduleAtFixedRate(() -> {
+                long duration = System.currentTimeMillis() - beginTime;
+                if (duration != 0 && totalRequest != 0) {
+                    if (totalResponseTime > 10000000) {
+                        log.info("qps: {}, avg response time: {}, totalRequest: {}, totalResponseTime: {}, duration: {}",
+                                1000 * totalRequest / duration, ((float) totalResponseTime) / totalRequest, totalRequest, totalResponseTime, duration);
+                        totalResponseTimeUpdater.set(this, 0);
+                        totalRequestUpdater.set(this, 0);
+                        beginTimeUpdater.set(this, System.currentTimeMillis());
+                    }
+                }
+            }, 0, 1, TimeUnit.MINUTES);
+        }
+    }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -79,6 +99,7 @@ public class DispatchMessage extends SimpleChannelInboundHandler<Frame> implemen
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Frame msg) throws Exception {
+        long start = System.currentTimeMillis();
         // 将ctx绑定到业务线程
         try {
             ChannelHandlerContextHolder.setCtx(ctx);
@@ -94,31 +115,11 @@ public class DispatchMessage extends SimpleChannelInboundHandler<Frame> implemen
                 }
                 Object rtv = handlerMethod.getMethod().invoke(applicationContext.getBean(handlerMethod.getHandler()), arg);
                 ctx.writeAndFlush(rtv);
-                if (started) {
-                    // 统计请求数
-                    countUpdater.incrementAndGet(this);
-                }
             }
         } finally {
             ChannelHandlerContextHolder.clear();
+            totalResponseTimeUpdater.addAndGet(this, System.currentTimeMillis() - start);
+            totalRequestUpdater.incrementAndGet(this);
         }
-    }
-
-    public void startCount() {
-        count = 0;
-        startTime = System.currentTimeMillis();
-        started = true;
-    }
-
-    public void stopCount() {
-        started = false;
-    }
-
-    public long getCount() {
-        return count;
-    }
-
-    public long getStartTime() {
-        return startTime;
     }
 }

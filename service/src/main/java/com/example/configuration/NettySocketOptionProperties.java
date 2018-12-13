@@ -32,4 +32,13 @@ public class NettySocketOptionProperties {
      * tcp no delay
      */
     private Boolean nodelay = true;
+
+    private Boolean autoClose = false;
+
+    private Boolean reuseaddr = false;
+
+    /**
+     * 等待client连接的超时时间
+     */
+    private Integer timeout = 6000;
 }

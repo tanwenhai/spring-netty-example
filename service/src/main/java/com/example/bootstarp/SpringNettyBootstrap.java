@@ -60,6 +60,9 @@ public class SpringNettyBootstrap implements ApplicationRunner {
 
             b.childOption(ChannelOption.TCP_NODELAY, nettySocketOptionProperties.getNodelay());
             b.childOption(ChannelOption.SO_KEEPALIVE, nettySocketOptionProperties.getKeepalive());
+            b.childOption(ChannelOption.AUTO_CLOSE, nettySocketOptionProperties.getAutoClose());
+            b.childOption(ChannelOption.SO_REUSEADDR, nettySocketOptionProperties.getReuseaddr());
+//            b.childOption(ChannelOption.SO_TIMEOUT, nettySocketOptionProperties.getTimeout());
             b.childOption(ChannelOption.SO_RCVBUF, nettySocketOptionProperties.getRcvbuf());
             b.childOption(ChannelOption.SO_SNDBUF, nettySocketOptionProperties.getSndbuf());
 

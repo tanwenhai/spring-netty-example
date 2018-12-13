@@ -30,4 +30,31 @@ subprojects {
             }
         }
     }
+
+    repositories {
+        maven {
+            name "aliyunmaven"
+            url "https://maven.aliyun.com/repository/central"
+        }
+        maven {
+            name "google"
+            url "https://maven.aliyun.com/repository/google"
+        }
+        maven {
+            name "gradle-plugin"
+            url "https://maven.aliyun.com/repository/gradle-plugin"
+        }
+        maven {
+            name "jcenter"
+            url "https://maven.aliyun.com/repository/jcenter"
+        }
+        maven {
+            name "spring-plugin"
+            url "https://maven.aliyun.com/repository/spring-plugin"
+        }
+        maven {
+            name "spring"
+            url "https://maven.aliyun.com/repository/spring"
+        }
+    }
 }

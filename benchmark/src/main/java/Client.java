@@ -9,63 +9,95 @@ import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 
-import java.util.concurrent.Executor;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
+
+import static io.netty.channel.ChannelFutureListener.CLOSE_ON_FAILURE;
 
 /**
  * @author tanwenhai@bilibili.com
  */
 public class Client {
     public static void main(String[] args) throws InterruptedException {
-        Bootstrap b = new Bootstrap();
-        EventLoopGroup group = new NioEventLoopGroup();
+        ExecutorService executorService = Executors.newCachedThreadPool();
         CounterHandler counterHandler = new CounterHandler();
-        b.group(group)
-                .channel(NioSocketChannel.class)
-                .handler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    protected void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline()
-                                .addLast(new ProtobufVarint32FrameDecoder())
-                                .addLast(new ProtobufDecoder(TextMessage.getDefaultInstance()))
-                                .addLast(new ProtobufVarint32LengthFieldPrepender())
-                                .addLast(new ProtobufEncoder())
-                                .addLast(new NioEventLoopGroup(200), counterHandler);
-                    }
-                });
-        ChannelFuture connect = b.connect("127.0.0.1", 9999);
+        EventLoopGroup group = new NioEventLoopGroup();
+        Bootstrap b = new Bootstrap();
+        try {
+            b.group(group)
+                    .channel(NioSocketChannel.class)
+                    .option(ChannelOption.SO_REUSEADDR, true)
+                    .option(ChannelOption.TCP_NODELAY, true)
+                    .handler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel ch) throws Exception {
+                            ch.pipeline()
+                                    .addLast(new ProtobufVarint32FrameDecoder())
+                                    .addLast(new ProtobufDecoder(TextMessage.getDefaultInstance()))
+                                    .addLast(new ProtobufVarint32LengthFieldPrepender())
+                                    .addLast(new ProtobufEncoder())
+                                    .addLast(counterHandler);
+                        }
+                    });
 
-        connect.channel().closeFuture().sync();
+            ChannelFuture connect = null;
+            for (int i = 0; i < 5000; i++) {
+                connect = b.connect("127.0.0.1", 9999);
+                connect.addListener(CLOSE_ON_FAILURE);
+            }
+            connect.channel().closeFuture().get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } finally {
+            group.shutdownGracefully().sync();
+        }
+
     }
 }
 
 @ChannelHandler.Sharable
 class CounterHandler extends SimpleChannelInboundHandler<TextMessage> {
-    private static AtomicLong count = new AtomicLong(0);
+    private volatile int count;
+    private AtomicIntegerFieldUpdater countUpdater = AtomicIntegerFieldUpdater.newUpdater(CounterHandler.class, "count");
     long end;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TextMessage msg) throws Exception {
         if (System.currentTimeMillis() < end) {
-            count.incrementAndGet();
+            countUpdater.incrementAndGet(this);
             TextMessage textMessage = TextMessage.newBuilder().setText("1111").build();
             Frame frame = Frame.newBuilder().setPath("/hello/say").setPayload(textMessage.toByteString()).build();
             ctx.writeAndFlush(frame);
         } else {
-            System.out.println(count.get() / 60);
+            System.out.println(count / 60);
             ctx.close();
         }
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        end = System.currentTimeMillis() + 60 * 1000;
         TextMessage textMessage = TextMessage.newBuilder().setText("1111").build();
         Frame frame = Frame.newBuilder().setPath("/hello/say").setPayload(textMessage.toByteString()).build();
         ctx.writeAndFlush(frame);
+    }
+
+    @Override
+    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+        end = System.currentTimeMillis() + (60 * 1000);
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        super.exceptionCaught(ctx, cause);
+    }
+
+    private long getCount() {
+        return count;
     }
 }

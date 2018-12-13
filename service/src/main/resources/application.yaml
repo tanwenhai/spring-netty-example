@@ -13,4 +13,4 @@ netty:
       threads: 200
     socket:
       keepalive: true
-      backlog: 100
+      backlog: 8192

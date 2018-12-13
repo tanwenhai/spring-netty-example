@@ -2,6 +2,7 @@ buildscript {
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath "io.franzbecker:gradle-lombok:1.14"
+        classpath 'com.google.gradle:osdetector-gradle-plugin:1.6.0'
     }
 }
 
@@ -10,14 +11,11 @@ apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: "io.franzbecker.gradle-lombok"
+apply plugin: 'com.google.osdetector'
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
-
-repositories {
-    mavenCentral()
-}
 
 bootJar {
     launchScript()
@@ -34,6 +32,9 @@ dependencies {
 
     // https://mvnrepository.com/artifact/io.netty/netty-all
     implementation group: 'io.netty', name: 'netty-all', version: '4.1.32.Final'
+
+    // https://mvnrepository.com/artifact/io.netty/netty-transport-native-epoll
+    implementation group: 'io.netty', name: 'netty-transport-native-epoll', version: '4.1.32.Final'
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.8.1'
