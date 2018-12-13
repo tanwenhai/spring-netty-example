@@ -48,7 +48,7 @@ public class Client {
 
             ChannelFuture connect = null;
             for (int i = 0; i < 5000; i++) {
-                connect = b.connect("127.0.0.1", 9999);
+                connect = b.connect("10.23.157.199", 9999);
                 connect.addListener(CLOSE_ON_FAILURE);
             }
             connect.channel().closeFuture().get();
@@ -57,7 +57,7 @@ public class Client {
         } finally {
             group.shutdownGracefully().sync();
         }
-        counterHandler.getqps();
+        System.out.println(counterHandler.getqps());
     }
 }
 
