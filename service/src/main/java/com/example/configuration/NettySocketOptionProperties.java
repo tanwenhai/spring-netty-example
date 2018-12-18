@@ -11,6 +11,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Getter
 @Setter
 public class NettySocketOptionProperties {
+    /**
+     * 周期性测试连接是否存活
+     */
     private Boolean keepalive = true;
 
     /**
@@ -41,4 +44,7 @@ public class NettySocketOptionProperties {
      * 等待client连接的超时时间
      */
     private Integer timeout = 6000;
+
+
+    private Boolean tcpquickack = false;
 }
