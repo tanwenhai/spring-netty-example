@@ -51,6 +51,11 @@ public class SpringNettyBootstrap implements ApplicationRunner {
 
             // 设置tcp三次握手的队列长度
             b.option(ChannelOption.SO_BACKLOG, nettySocketOptionProperties.getBacklog());
+            // 设置监听套接字的选项，连接套接字继承这些选项
+            b.option(ChannelOption.TCP_NODELAY, nettySocketOptionProperties.getNodelay());
+            b.option(ChannelOption.SO_KEEPALIVE, nettySocketOptionProperties.getKeepalive());
+            b.option(ChannelOption.SO_RCVBUF, nettySocketOptionProperties.getRcvbuf());
+            b.option(ChannelOption.SO_SNDBUF, nettySocketOptionProperties.getSndbuf());
             if (log.isDebugEnabled()) {
                 b.handler(new LoggingHandler(LogLevel.DEBUG));
             }
