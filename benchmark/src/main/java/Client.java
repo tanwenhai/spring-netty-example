@@ -33,7 +33,7 @@ public class Client {
             b.group(group)
                     .channel(NioSocketChannel.class)
                     .option(ChannelOption.SO_REUSEADDR, true)
-                    .option(ChannelOption.TCP_NODELAY, true)
+                    .option(ChannelOption.TCP_NODELAY, false)
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
@@ -47,7 +47,7 @@ public class Client {
                     });
 
             ChannelFuture connect = null;
-            for (int i = 0; i < 5000; i++) {
+            for (int i = 0; i < 20000; i++) {
                 connect = b.connect("10.23.157.199", 9999);
                 connect.addListener(CLOSE_ON_FAILURE);
             }
@@ -65,14 +65,15 @@ public class Client {
 class CounterHandler extends SimpleChannelInboundHandler<TextMessage> {
     private volatile int count;
     private AtomicIntegerFieldUpdater countUpdater = AtomicIntegerFieldUpdater.newUpdater(CounterHandler.class, "count");
+    TextMessage textMessage = TextMessage.newBuilder().setText("1111").build();
+    private Frame frame = Frame.newBuilder().setPath("/hello/say").setPayload(textMessage.toByteString()).build();
+
     long end;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TextMessage msg) throws Exception {
         if (System.currentTimeMillis() < end) {
             countUpdater.incrementAndGet(this);
-            TextMessage textMessage = TextMessage.newBuilder().setText("1111").build();
-            Frame frame = Frame.newBuilder().setPath("/hello/say").setPayload(textMessage.toByteString()).build();
             ctx.writeAndFlush(frame);
         } else {
             ctx.close();
@@ -81,8 +82,6 @@ class CounterHandler extends SimpleChannelInboundHandler<TextMessage> {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        TextMessage textMessage = TextMessage.newBuilder().setText("1111").build();
-        Frame frame = Frame.newBuilder().setPath("/hello/say").setPayload(textMessage.toByteString()).build();
         ctx.writeAndFlush(frame);
     }
 

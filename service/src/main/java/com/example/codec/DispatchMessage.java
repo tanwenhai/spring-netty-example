@@ -80,9 +80,9 @@ public class DispatchMessage extends SimpleChannelInboundHandler<Frame> implemen
             ctx.executor().scheduleAtFixedRate(() -> {
                 long duration = System.currentTimeMillis() - beginTime;
                 if (duration != 0 && totalRequest != 0) {
-                    log.info("qps: {}, avg response time: {}, totalRequest: {}, totalResponseTime: {}, duration: {}",
-                            1000 * totalRequest / duration, ((float) totalResponseTime) / totalRequest, totalRequest, totalResponseTime, duration);
-                    if (totalResponseTime > 10000000) {
+                    log.info("qps: {}, avg response time: {}ms, totalRequest: {}, totalResponseTime: {}ms, duration: {}ms",
+                            1000L * totalRequest / duration, ((float) totalResponseTime) / totalRequest, totalRequest, totalResponseTime, duration);
+                    if (totalRequest > 1000000) {
                         totalResponseTimeUpdater.set(this, 0);
                         totalRequestUpdater.set(this, 0);
                         beginTimeUpdater.set(this, System.currentTimeMillis());
