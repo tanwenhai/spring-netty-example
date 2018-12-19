@@ -85,7 +85,7 @@ public class DispatchMessage extends SimpleChannelInboundHandler<Frame> implemen
                     if (totalRequest > 1000000) {
                         totalResponseTimeUpdater.set(this, 0);
                         totalRequestUpdater.set(this, 0);
-                        beginTimeUpdater.set(this, System.currentTimeMillis());
+                        beginTimeUpdater.set(this, 0);
                     }
                 }
             }, 0, 1, TimeUnit.MINUTES);
