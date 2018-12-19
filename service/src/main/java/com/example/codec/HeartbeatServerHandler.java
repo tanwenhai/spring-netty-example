@@ -21,6 +21,8 @@ public class HeartbeatServerHandler extends ChannelInboundHandlerAdapter {
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent) {
             ctx.writeAndFlush(HEARTBEAT_PACK.duplicate()).addListener(CLOSE_ON_FAILURE);
+        } else {
+            super.userEventTriggered(ctx, evt);
         }
     }
 }
