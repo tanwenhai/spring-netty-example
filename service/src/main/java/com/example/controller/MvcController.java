@@ -1,25 +1,18 @@
 package com.example.controller;
 
-import com.example.annotation.CommandController;
-import com.example.annotation.CommandMapper;
-import com.example.annotation.MessageLiteParam;
-import com.example.proto.TextMessage;
-import com.example.services.TestService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @author tanwenhai@bilibili.com
  */
-@CommandController
-public class HelloController {
-
-    @Autowired
-    TestService testService;
-
-    @CommandMapper("/hello/say")
-    public TextMessage say(@MessageLiteParam TextMessage msg) {
+@RestController
+@RequestMapping("/mvc")
+public class MvcController {
+    @RequestMapping("/index")
+    public String index() {
         // 90.0% == 1ms
         // 95.0% == 10ms  1000 50 > 10ms
         // 99.0% == 100ms 1000 10 > 100ms
@@ -40,7 +33,6 @@ public class HelloController {
             Thread.sleep(time);
         } catch (InterruptedException e) {
         }
-
-        return testService.consume(msg);
+        return "1";
     }
 }

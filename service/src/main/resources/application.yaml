@@ -14,3 +14,7 @@ netty:
     socket:
       keepalive: true
       backlog: 8192
+server:
+  undertow:
+    direct-buffers: true
+    worker-threads:
