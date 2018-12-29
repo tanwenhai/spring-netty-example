@@ -54,8 +54,8 @@ public class ConnectionInitializer extends ChannelInitializer<SocketChannel> {
                 .addLast(new ProtobufDecoder(Frame.getDefaultInstance()))
                 .addLast(new ProtobufVarint32LengthFieldPrepender())
                 .addLast(new ProtobufEncoder())
-                .addLast(new IdleStateHandler(4, 4, 7, TimeUnit.SECONDS))
-                .addLast(new HeartbeatServerHandler())
+//                .addLast(new IdleStateHandler(4, 4, 7, TimeUnit.SECONDS))
+//                .addLast(new HeartbeatServerHandler())
                 .addLast(blockGroup, dispatchMessage);
     }
 }

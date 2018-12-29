@@ -48,7 +48,7 @@ public class Client {
                     });
 
             ChannelFuture connect = null;
-            for (int i = 0; i < 5000; i++) {
+            for (int i = 0; i < 20000; i++) {
                 connect = b.connect("10.23.157.199", 9999);
                 connect.addListener(CLOSE_ON_FAILURE);
             }
@@ -66,7 +66,7 @@ public class Client {
 class CounterHandler extends SimpleChannelInboundHandler<TextMessage> {
     private volatile long count;
     private AtomicLongFieldUpdater countUpdater = AtomicLongFieldUpdater.newUpdater(CounterHandler.class, "count");
-    TextMessage textMessage = TextMessage.newBuilder().setText("1111").build();
+    TextMessage textMessage = TextMessage.newBuilder().setText("11111111111").build();
     private Frame frame = Frame.newBuilder().setPath("/hello/say").setPayload(textMessage.toByteString()).build();
 
     long end;
@@ -78,6 +78,7 @@ class CounterHandler extends SimpleChannelInboundHandler<TextMessage> {
             ctx.writeAndFlush(frame);
         } else {
             ctx.close();
+            System.out.println(getqps());
         }
     }
 
@@ -88,7 +89,7 @@ class CounterHandler extends SimpleChannelInboundHandler<TextMessage> {
 
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
-        end = System.currentTimeMillis() + (60 * 60 * 15 * 1000);
+        end = System.currentTimeMillis() + (60 * 1000);
     }
 
     @Override

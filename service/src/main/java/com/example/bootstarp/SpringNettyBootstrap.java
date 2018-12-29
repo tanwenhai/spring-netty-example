@@ -7,6 +7,9 @@ import io.netty.channel.AdaptiveRecvByteBufAllocator;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.epoll.Epoll;
+import io.netty.channel.epoll.EpollChannelOption;
+import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +55,7 @@ public class SpringNettyBootstrap implements ApplicationRunner {
 
             // 设置tcp三次握手的队列长度
             b.option(ChannelOption.SO_BACKLOG, nettySocketOptionProperties.getBacklog());
+
             if (log.isDebugEnabled()) {
                 b.handler(new LoggingHandler(LogLevel.DEBUG));
             }
@@ -64,7 +68,9 @@ public class SpringNettyBootstrap implements ApplicationRunner {
             b.childOption(ChannelOption.SO_REUSEADDR, nettySocketOptionProperties.getReuseaddr());
             b.childOption(ChannelOption.SO_RCVBUF, nettySocketOptionProperties.getRcvbuf());
             b.childOption(ChannelOption.SO_SNDBUF, nettySocketOptionProperties.getSndbuf());
-
+            if (Epoll.isAvailable() && serverProperties.getChannel().equals(EpollServerSocketChannel.class)) {
+                b.childOption(EpollChannelOption.TCP_QUICKACK, true);
+            }
             ChannelFuture f = b.bind(serverProperties.getAddress(), serverProperties.getPort()).sync();
             log.info("started and listening for connections on" + f.channel().localAddress());
             f.channel().closeFuture().sync();
