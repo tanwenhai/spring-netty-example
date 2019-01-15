@@ -74,6 +74,7 @@ public class CommandHandlerMethodMapping implements ApplicationContextAware {
             Map<Method, CommandHandlerMethod> methods = MethodIntrospector.selectMethods(userType,
                     (MethodIntrospector.MetadataLookup<CommandHandlerMethod>) method -> {
                         try {
+                            method.setAccessible(false);
                             return getMappingForMethod(method, handler);
                         }
                         catch (Throwable ex) {

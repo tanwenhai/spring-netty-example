@@ -62,6 +62,7 @@ public class DispatchMessage extends SimpleChannelInboundHandler<Frame> implemen
             try {
                 Class<?> clazz = Class.forName(beanDefinition.getBeanClassName());
                 Method method = clazz.getMethod("parseFrom", ByteString.class);
+                method.setAccessible(false);
                 builder.put(clazz.getName(), method);
                 log.debug("message method cache put {} -> {}#{}", clazz.getName(), clazz.getName(), method.getName());
             } catch (ClassNotFoundException e) {
